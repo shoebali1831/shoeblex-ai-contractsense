@@ -1,0 +1,23 @@
+---
+description: Frontend rules for React UI
+alwaysApply: true
+---
+
+# Frontend Rules
+
+Use React with TypeScript.
+Frontend must not call OpenAI directly.
+Frontend only calls backend APIs.
+
+Main components:
+- UploadBox
+- PdfViewerPanel
+- AnalysisPanel
+- RiskScoreCard
+- ClauseCard
+- RiskFindingCard
+- ChatPanel
+- LoadingSpinner
+
+Keep UI clean and demo-ready.
+Do not overbuild dashboard before MVP works.

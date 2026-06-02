@@ -1,0 +1,32 @@
+---
+description: Backend rules for ASP.NET Core
+alwaysApply: true
+---
+
+# Backend Rules
+
+Use ASP.NET Core Web API.
+
+Controllers should be thin.
+Business logic should be inside services.
+
+Use these services:
+- DocumentService
+- PdfExtractionService
+- ChunkingService
+- OpenAIEmbeddingService
+- RagService
+- ClauseAnalysisService
+- RiskScoringService
+
+Required APIs:
+- POST /api/documents/upload
+- GET /api/documents/{documentId}
+- GET /api/documents/{documentId}/file
+- GET /api/documents/{documentId}/analysis
+- POST /api/chat/ask
+
+Use async/await.
+Return clean JSON responses.
+Handle errors clearly.
+Never expose internal stack traces to the frontend.

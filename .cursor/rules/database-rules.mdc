@@ -1,0 +1,21 @@
+---
+description: Database and pgvector rules
+alwaysApply: true
+---
+
+# Database Rules
+
+Use PostgreSQL.
+Use pgvector for embeddings.
+
+Core tables:
+- documents
+- contract_chunks
+- clauses
+- risk_findings
+- chat_messages
+
+For RAG search:
+- Always filter by document_id.
+- Return top 3 to 5 chunks.
+- Include page number and source text.

@@ -1,0 +1,6 @@
+@ContractSense.Api_HostAddress = http://localhost:5224
+
+GET {{ContractSense.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

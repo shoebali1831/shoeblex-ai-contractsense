@@ -1,0 +1,18 @@
+# macOS
+.DS_Store
+
+# .NET
+**/bin/
+**/obj/
+*.user
+*.suo
+
+# Node
+node_modules/
+frontend/dist/
+
+# Runtime artifacts
+backend/ContractSense.Api/uploads/
+
+# Local nested repositories
+shoeblex-ai-contractsense/

@@ -1,0 +1,8 @@
+Shoeblex AI ContractSense — All In One Cursor Guide
+
+This file is provided to match the expected project structure from the knowledge spec.
+
+Canonical source:
+knowledge/Shoeblex_AI_All_In_One_Cursor_Knowledge.txt
+
+Use the canonical file above as the authoritative and complete all-in-one guide.
