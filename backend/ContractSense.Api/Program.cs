@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using Pgvector.EntityFrameworkCore;
 
+LoadLocalSecretsEnv();
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
@@ -74,3 +76,79 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+static void LoadLocalSecretsEnv()
+{
+    var cwd = Directory.GetCurrentDirectory();
+    var candidatePaths = new[]
+    {
+        Path.Combine(cwd, "secrets", "keys.local.env"),
+        Path.GetFullPath(Path.Combine(cwd, "..", "..", "secrets", "keys.local.env"))
+    };
+
+    var envPath = candidatePaths.FirstOrDefault(File.Exists);
+    if (string.IsNullOrWhiteSpace(envPath))
+    {
+        return;
+    }
+
+    var mapping = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+    {
+        ["OPENAI_API_KEY"] = "OpenAI__ApiKey",
+        ["OPENAI_BASE_URL"] = "OpenAI__BaseUrl",
+        ["OPENAI_CHAT_MODEL"] = "OpenAI__ChatModel",
+        ["OPENAI_EMBEDDING_MODEL"] = "OpenAI__EmbeddingModel",
+        ["DATABASE_URL"] = "ConnectionStrings__DefaultConnection"
+    };
+
+    foreach (var rawLine in File.ReadAllLines(envPath))
+    {
+        var line = rawLine.Trim();
+        if (line.Length == 0 || line.StartsWith('#'))
+        {
+            continue;
+        }
+
+        var equalsIndex = line.IndexOf('=');
+        if (equalsIndex <= 0)
+        {
+            continue;
+        }
+
+        var key = line[..equalsIndex].Trim();
+        var value = line[(equalsIndex + 1)..].Trim();
+        value = TrimWrappingQuotes(value);
+
+        if (key.Length == 0 || value.Length == 0)
+        {
+            continue;
+        }
+
+        SetIfMissing(key, value);
+
+        if (mapping.TryGetValue(key, out var mappedKey))
+        {
+            SetIfMissing(mappedKey, value);
+        }
+    }
+}
+
+static void SetIfMissing(string key, string value)
+{
+    if (string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable(key)))
+    {
+        Environment.SetEnvironmentVariable(key, value);
+    }
+}
+
+static string TrimWrappingQuotes(string value)
+{
+    if (value.Length >= 2 &&
+        ((value.StartsWith('"') && value.EndsWith('"')) ||
+         (value.StartsWith('\'') && value.EndsWith('\''))))
+    {
+        return value[1..^1];
+    }
+
+    return value;
+}

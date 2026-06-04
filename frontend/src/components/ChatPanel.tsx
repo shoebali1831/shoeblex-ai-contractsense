@@ -97,11 +97,11 @@ export function ChatPanel({ disabled, isAsking, onAsk }: ChatPanelProps) {
         ) : null}
         {history.map((item, index) => (
           <div key={`${item.question}-${index}`} className="card compact chat-item">
-            <p className="chat-question">
-              <strong>You:</strong> {item.question}
+            <p className="chat-question chat-bubble chat-bubble-user">
+              <strong>You</strong> {item.question}
             </p>
-            <p className="chat-answer">
-              <strong>AI:</strong> {item.answer}
+            <p className="chat-answer chat-bubble chat-bubble-ai">
+              <strong>AI</strong> {item.answer}
             </p>
             <p className="muted meta-line">
               Sources: {item.sourcePages.length ? item.sourcePages.join(', ') : 'None'}

@@ -20,6 +20,12 @@ export function RiskScoreCard({ score, level }: RiskScoreCardProps) {
       <div className="risk-progress-track" role="presentation">
         <span className="risk-progress-fill" style={{ width: `${safeWidth}%` }} />
       </div>
+      <div className="risk-scale">
+        <span>0 Low</span>
+        <span>30 Medium</span>
+        <span>70 High</span>
+        <span>100</span>
+      </div>
       <p className="risk-level">Higher score means more contractual risk signals.</p>
     </div>
   )

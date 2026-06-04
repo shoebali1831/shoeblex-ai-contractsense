@@ -21,6 +21,8 @@ import { PdfViewerPanel } from './components/PdfViewerPanel'
 import { UploadBox } from './components/UploadBox'
 import type { DocumentAnalysis } from './types'
 
+const LAYOUT_WIDTH_STORAGE_KEY = 'contractsense.review.leftPaneWidth'
+
 const audienceSegments = [
   'Business operations teams',
   'Finance teams',
@@ -154,6 +156,15 @@ function ReviewRoute() {
   const [isLoading, setIsLoading] = useState(true)
   const [isAsking, setIsAsking] = useState(false)
   const [error, setError] = useState('')
+  const [leftPaneWidth, setLeftPaneWidth] = useState(() => {
+    const raw = window.localStorage.getItem(LAYOUT_WIDTH_STORAGE_KEY)
+    const parsed = raw ? Number(raw) : 56
+    if (Number.isNaN(parsed)) {
+      return 56
+    }
+    return Math.min(70, Math.max(40, parsed))
+  })
+  const [focusPage, setFocusPage] = useState<number>()
 
   const pdfUrl = useMemo(
     () => (documentId ? getDocumentPdfUrl(documentId) : undefined),
@@ -177,6 +188,10 @@ function ReviewRoute() {
       }
     })()
   }, [documentId])
+
+  useEffect(() => {
+    window.localStorage.setItem(LAYOUT_WIDTH_STORAGE_KEY, String(leftPaneWidth))
+  }, [leftPaneWidth])
 
   async function handleAsk(question: string) {
     if (!documentId) {
@@ -217,12 +232,27 @@ function ReviewRoute() {
       ) : null}
       {error ? <p className="error-banner">{error}</p> : null}
 
-      <section className="review-layout">
+      <div className="layout-resizer card compact">
+        <label htmlFor="pane-width">Workspace layout</label>
+        <input
+          id="pane-width"
+          type="range"
+          min={40}
+          max={70}
+          value={leftPaneWidth}
+          onChange={(event) => setLeftPaneWidth(Number(event.target.value))}
+        />
+      </div>
+
+      <section
+        className="review-layout"
+        style={{ gridTemplateColumns: `${leftPaneWidth}% ${100 - leftPaneWidth}%` }}
+      >
         <section className="left-pane">
-          <PdfViewerPanel pdfUrl={pdfUrl} />
+          <PdfViewerPanel pdfUrl={pdfUrl} focusPage={focusPage} />
         </section>
         <section className="right-pane">
-          <AnalysisPanel analysis={analysis} />
+          <AnalysisPanel analysis={analysis} onJumpToPage={setFocusPage} />
           <ChatPanel
             disabled={!analysis}
             isAsking={isAsking}

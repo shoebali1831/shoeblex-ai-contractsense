@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Document, Page, pdfjs } from 'react-pdf'
 import 'react-pdf/dist/Page/AnnotationLayer.css'
 import 'react-pdf/dist/Page/TextLayer.css'
@@ -10,16 +10,29 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
 
 type PdfViewerPanelProps = {
   pdfUrl?: string
+  focusPage?: number
 }
 
-export function PdfViewerPanel({ pdfUrl }: PdfViewerPanelProps) {
+export function PdfViewerPanel({ pdfUrl, focusPage }: PdfViewerPanelProps) {
   const [numPages, setNumPages] = useState(0)
   const [pdfError, setPdfError] = useState('')
+  const scrollRef = useRef<HTMLDivElement | null>(null)
 
   const pages = useMemo(
     () => Array.from({ length: numPages }, (_, index) => index + 1),
     [numPages],
   )
+
+  useEffect(() => {
+    if (!focusPage || !scrollRef.current) {
+      return
+    }
+
+    const target = scrollRef.current.querySelector<HTMLElement>(
+      `#pdf-page-${focusPage}`,
+    )
+    target?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  }, [focusPage, numPages])
 
   return (
     <div className="panel viewer-panel">
@@ -28,7 +41,7 @@ export function PdfViewerPanel({ pdfUrl }: PdfViewerPanelProps) {
         <span className="status-pill">Read mode</span>
       </div>
       {pdfUrl ? (
-        <div className="pdf-scroll">
+        <div className="pdf-scroll" ref={scrollRef}>
           <Document
             file={pdfUrl}
             className="pdf-document"
@@ -43,13 +56,19 @@ export function PdfViewerPanel({ pdfUrl }: PdfViewerPanelProps) {
             }}
           >
             {pages.map((pageNumber) => (
-              <Page
+              <div
                 key={pageNumber}
-                pageNumber={pageNumber}
-                className="pdf-page"
-                renderTextLayer
-                renderAnnotationLayer
-              />
+                id={`pdf-page-${pageNumber}`}
+                className={`pdf-page-wrap ${focusPage === pageNumber ? 'pdf-page-wrap-active' : ''}`}
+              >
+                <p className="pdf-page-label">Page {pageNumber}</p>
+                <Page
+                  pageNumber={pageNumber}
+                  className="pdf-page"
+                  renderTextLayer
+                  renderAnnotationLayer
+                />
+              </div>
             ))}
           </Document>
           {pdfError ? <p className="error-banner">{pdfError}</p> : null}
